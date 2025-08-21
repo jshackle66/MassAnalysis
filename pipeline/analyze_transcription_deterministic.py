@@ -14,7 +14,7 @@ def analyze_transcription(transcription_data):
     Returns:
         dict: A dictionary where keys are the parts of the Mass and values are the start times.
     """
-    with open("./pipeline/mass_keywords.json", "r") as f:
+    with open("mass_keywords.json", "r") as f:
         mass_keywords = json.load(f)
 
     mass_parts_ordered = [

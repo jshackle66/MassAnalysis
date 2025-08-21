@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mv dist/* ../ && rm dist",
-    "lint": "eslint .",
+    "build": "vite build && sed -i 's|/assets|/MassAnalysis/assets|g' dist/index.html && rm -rf ../assets && mv dist/* ../ && rmdir dist",
     "preview": "vite preview"
   },
   "dependencies": {

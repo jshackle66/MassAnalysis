@@ -150,6 +150,7 @@ const MassDetailViewer = ({ mass, theme, data, massSortOrder, setMassSortOrder, 
                         <p><strong>Priest:</strong> {mass.metadata.priest}</p>
                         <p><strong>Location:</strong> {mass.metadata.mass_location}</p>
                         <p><strong>Time:</strong> {mass.metadata.mass_time}</p>
+                        <p><strong>Date:</strong> {mass.metadata.date}</p>
                         <p><strong>Total Duration:</strong> {Math.floor(mass.duration / 60)}m {Math.round(mass.duration % 60)}s</p>
                     </div>
                 )}
