@@ -1,0 +1,11 @@
+.homily-transcript-container {
+    padding: 2rem;
+}
+
+.transcript-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 8px;
+}

@@ -1,0 +1,36 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+body.light {
+  --bg-color: #ffffff;
+  --text-color: #213547;
+  --header-bg: #f8f8f8;
+  --header-color: #213547;
+  --border-color: #e0e0e0;
+}
+
+body.dark {
+  --bg-color: #242424;
+  --text-color: rgba(255, 255, 255, 0.87);
+  --header-bg: #1a1a1a;
+  --header-color: rgba(255, 255, 255, 0.87);
+  --border-color: #3a3a3a;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}

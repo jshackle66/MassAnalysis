@@ -1,0 +1,23 @@
+
+.homily-keyword-histogram-container {
+    margin-top: 2rem;
+}
+
+.homily-keyword-histogram-container .controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.display-area {
+    display: flex;
+    gap: 2rem;
+}
+
+.histogram-area {
+    flex: 1;
+}
+
+.transcript-area {
+    flex: 1;
+}
