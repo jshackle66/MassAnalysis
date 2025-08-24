@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Mass } from '../types';
 import Chart from 'chart.js/auto';
-import './HomilyKeywordHistogram.css';
-import HomilyTranscript from './HomilyTranscript';
-import './HomilyTranscript.css';
-import { getHomily } from './getHomily';
 
-const HomilyKeywordHistogram = ({ data, theme }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+interface HomilyKeywordHistogramProps {
+    data: Mass[];
+    theme: string;
+}
+
+const HomilyKeywordHistogram: React.FC<HomilyKeywordHistogramProps> = ({ data, theme }) => {
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstance = useRef<Chart | null>(null);
     const [keyword, setKeyword] = useState('');
     const [selectedPriest, setSelectedPriest] = useState('');
-    const [priests, setPriests] = useState([]);
+    const [priests, setPriests] = useState<string[]>([]);
     const [currentHomilyIndex, setCurrentHomilyIndex] = useState(0);
 
     useEffect(() => {
@@ -22,7 +24,7 @@ const HomilyKeywordHistogram = ({ data, theme }) => {
     }, [data]);
 
 
-    const handleKeywordChange = (event) => {
+    const handleKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setKeyword(event.target.value);
     };
 
@@ -61,7 +63,7 @@ const HomilyKeywordHistogram = ({ data, theme }) => {
             return;
         }
 
-        const priestKeywordCounts = {};
+        const priestKeywordCounts: { [key: string]: number } = {};
         data.forEach(mass => {
             const priest = mass.metadata.priest;
             if (!priest) return;
@@ -82,7 +84,10 @@ const HomilyKeywordHistogram = ({ data, theme }) => {
             chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
         const chartContext = chartRef.current.getContext('2d');
+        if (!chartContext) return;
+
         const textColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.87)' : '#213547';
         const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
         const barBackgroundColor = theme === 'dark' ? 'rgba(255, 159, 64, 0.8)' : 'rgba(255, 159, 64, 0.6)';

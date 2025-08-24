@@ -1,9 +1,15 @@
 import React, { useEffect, useRef } from 'react';
+import { Mass } from '../types';
 import Chart from 'chart.js/auto';
 
-const MassDurationHistogram = ({ data, theme }) => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
+interface MassDurationHistogramProps {
+    data: Mass[];
+    theme: string;
+}
+
+const MassDurationHistogram: React.FC<MassDurationHistogramProps> = ({ data, theme }) => {
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstance = useRef<Chart | null>(null);
 
   useEffect(() => {
     if (data.length === 0) {
@@ -15,38 +21,42 @@ const MassDurationHistogram = ({ data, theme }) => {
     }
 
     const massDurations = data.map(mass => {
-      const start = parseFloat(mass.mass_parts.beginning_of_mass);
-      const end = parseFloat(mass.mass_parts.end_of_mass);
+      const start = parseFloat(mass.mass_parts.beginning_of_mass as string);
+      const end = parseFloat(mass.mass_parts.end_of_mass as string);
       if (!isNaN(start) && !isNaN(end)) {
         return (end - start) / 60; // in minutes
       }
       return null;
-    }).filter(duration => duration !== null);
+    }).filter((duration): duration is number => duration !== null);
 
     if (chartInstance.current) {
       chartInstance.current.destroy();
     }
 
+    if (!chartRef.current) return;
     const chartContext = chartRef.current.getContext('2d');
+    if (!chartContext) return;
 
-    const numBins = Math.ceil(Math.sqrt(massDurations.length));
-    const minDuration = Math.min(...massDurations);
-    const maxDuration = Math.max(...massDurations);
+    const numBins = massDurations.length > 0 ? Math.ceil(Math.sqrt(massDurations.length)) : 1;
+    const minDuration = massDurations.length > 0 ? Math.min(...massDurations) : 0;
+    const maxDuration = massDurations.length > 0 ? Math.max(...massDurations) : 1;
     const binWidth = (maxDuration - minDuration) / numBins;
 
-    const bins = {};
-    for (let i = 0; i < numBins; i++) {
-        const binStart = minDuration + i * binWidth;
-        bins[binStart] = 0;
-    }
-
-    massDurations.forEach(duration => {
-        const binIndex = Math.floor((duration - minDuration) / binWidth);
-        const binStart = minDuration + binIndex * binWidth;
-        if(bins[binStart] !== undefined) {
-            bins[binStart]++;
+    const bins: { [key: number]: number } = {};
+    if (massDurations.length > 0) {
+        for (let i = 0; i < numBins; i++) {
+            const binStart = minDuration + i * binWidth;
+            bins[binStart] = 0;
         }
-    });
+
+        massDurations.forEach(duration => {
+            const binIndex = Math.floor((duration - minDuration) / binWidth);
+            const binStart = minDuration + binIndex * binWidth;
+            if(bins[binStart] !== undefined) {
+                bins[binStart]++;
+            }
+        });
+    }
 
     const labels = Object.keys(bins).map(binStart => {
         const start = parseFloat(binStart).toFixed(1);

@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Mass } from '../types';
 import Chart from 'chart.js/auto';
 
-const LocationTimeAverageDurationChart = ({ data, theme }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+interface LocationTimeStatsProps {
+    data: Mass[];
+    theme: string;
+}
+
+const LocationTimeAverageDurationChart: React.FC<LocationTimeStatsProps> = ({ data, theme }) => {
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstance = useRef<Chart | null>(null);
 
     useEffect(() => {
         if (data.length === 0) return;
 
-        const locationTimeData = {};
+        const locationTimeData: { [key: string]: { totalDuration: number, count: number } } = {};
         data.forEach(mass => {
             const location = mass.metadata.mass_location;
             const time = mass.metadata.mass_time;
@@ -17,8 +23,8 @@ const LocationTimeAverageDurationChart = ({ data, theme }) => {
             if (!locationTimeData[key]) {
                 locationTimeData[key] = { totalDuration: 0, count: 0 };
             }
-            const start = parseFloat(mass.mass_parts.beginning_of_mass);
-            const end = parseFloat(mass.mass_parts.end_of_mass);
+            const start = parseFloat(mass.mass_parts.beginning_of_mass as string);
+            const end = parseFloat(mass.mass_parts.end_of_mass as string);
             if (!isNaN(start) && !isNaN(end)) {
                 locationTimeData[key].totalDuration += (end - start) / 60; // in minutes
                 locationTimeData[key].count++;
@@ -32,7 +38,10 @@ const LocationTimeAverageDurationChart = ({ data, theme }) => {
             chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
         const chartContext = chartRef.current.getContext('2d');
+        if (!chartContext) return;
+
         const textColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.87)' : '#213547';
         const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
         const barBackgroundColor = theme === 'dark' ? 'rgba(54, 162, 235, 0.8)' : 'rgba(54, 162, 235, 0.6)';
@@ -62,9 +71,15 @@ const LocationTimeAverageDurationChart = ({ data, theme }) => {
     return <canvas ref={chartRef} />;
 };
 
-const LocationTimeMassHistogram = ({ data, selectedLocationTime, theme }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+interface LocationTimeMassHistogramProps {
+    data: Mass[];
+    selectedLocationTime: string;
+    theme: string;
+}
+
+const LocationTimeMassHistogram: React.FC<LocationTimeMassHistogramProps> = ({ data, selectedLocationTime, theme }) => {
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstance = useRef<Chart | null>(null);
 
     useEffect(() => {
         const filteredData = data.filter(mass => {
@@ -81,38 +96,42 @@ const LocationTimeMassHistogram = ({ data, selectedLocationTime, theme }) => {
         };
 
         const massDurations = filteredData.map(mass => {
-            const start = parseFloat(mass.mass_parts.beginning_of_mass);
-            const end = parseFloat(mass.mass_parts.end_of_mass);
+            const start = parseFloat(mass.mass_parts.beginning_of_mass as string);
+            const end = parseFloat(mass.mass_parts.end_of_mass as string);
             if (!isNaN(start) && !isNaN(end)) {
                 return (end - start) / 60; // in minutes
             }
             return null;
-        }).filter(duration => duration !== null);
+        }).filter((duration): duration is number => duration !== null);
 
         if (chartInstance.current) {
             chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
         const chartContext = chartRef.current.getContext('2d');
+        if (!chartContext) return;
         
-        const numBins = Math.ceil(Math.sqrt(massDurations.length));
-        const minDuration = Math.min(...massDurations);
-        const maxDuration = Math.max(...massDurations);
+        const numBins = massDurations.length > 0 ? Math.ceil(Math.sqrt(massDurations.length)) : 1;
+        const minDuration = massDurations.length > 0 ? Math.min(...massDurations) : 0;
+        const maxDuration = massDurations.length > 0 ? Math.max(...massDurations) : 1;
         const binWidth = (maxDuration - minDuration) / numBins;
 
-        const bins = {};
-        for (let i = 0; i < numBins; i++) {
-            const binStart = minDuration + i * binWidth;
-            bins[binStart] = 0;
-        }
-
-        massDurations.forEach(duration => {
-            const binIndex = Math.floor((duration - minDuration) / binWidth);
-            const binStart = minDuration + binIndex * binWidth;
-            if(bins[binStart] !== undefined) {
-                bins[binStart]++;
+        const bins: { [key: number]: number } = {};
+        if (massDurations.length > 0) {
+            for (let i = 0; i < numBins; i++) {
+                const binStart = minDuration + i * binWidth;
+                bins[binStart] = 0;
             }
-        });
+
+            massDurations.forEach(duration => {
+                const binIndex = Math.floor((duration - minDuration) / binWidth);
+                const binStart = minDuration + binIndex * binWidth;
+                if(bins[binStart] !== undefined) {
+                    bins[binStart]++;
+                }
+            });
+        }
 
         const labels = Object.keys(bins).map(binStart => {
             const start = parseFloat(binStart).toFixed(1);
@@ -150,9 +169,9 @@ const LocationTimeMassHistogram = ({ data, selectedLocationTime, theme }) => {
 };
 
 
-const LocationTimeStats = ({ data, theme }) => {
+const LocationTimeStats: React.FC<LocationTimeStatsProps> = ({ data, theme }) => {
     const [selectedLocationTime, setSelectedLocationTime] = useState('');
-    const [locationTimes, setLocationTimes] = useState([]);
+    const [locationTimes, setLocationTimes] = useState<string[]>([]);
 
     useEffect(() => {
         const uniqueLocationTimes = [...new Set(data.map(mass => `${mass.metadata.mass_location} ${mass.metadata.mass_time}`))]

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 
-const useIntersectionObserver = (options) => {
+const useIntersectionObserver = (options: IntersectionObserverInit) => {
     const [isIntersecting, setIsIntersecting] = useState(false);
-    const ref = useRef(null);
+    const ref = useRef<Element | null>(null);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -25,7 +25,7 @@ const useIntersectionObserver = (options) => {
         };
     }, [ref, options]);
 
-    return [ref, isIntersecting];
+    return [ref, isIntersecting] as const;
 };
 
 export default useIntersectionObserver;

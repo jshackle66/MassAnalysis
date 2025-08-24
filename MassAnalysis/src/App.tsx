@@ -15,8 +15,9 @@ import './components/MassDetailViewer.css';
 import './components/HomilyStats.css';
 import './components/HomilyKeywordHistogram.css';
 import './components/HomilyTranscript.css';
+import { Mass } from './types';
 
-const GraphSection = ({ children }) => {
+const GraphSection: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.5 });
 
     return (
@@ -29,7 +30,7 @@ const GraphSection = ({ children }) => {
 function App() {
   const [theme, setTheme] = useState('light');
   const [massType, setMassType] = useState('sunday'); // 'sunday' or 'daily'
-  const [massData, setMassData] = useState([]);
+  const [massData, setMassData] = useState<Mass[]>([]);
   const [massSortOrder, setMassSortOrder] = useState('asc');
   const [currentMassIndex, setCurrentMassIndex] = useState(0);
 
@@ -73,16 +74,16 @@ function App() {
 
   const sortedMasses = useMemo(() => {
     const massesWithDuration = filteredData.map(mass => {
-        const start = parseFloat(mass.mass_parts.beginning_of_mass);
-        const end = parseFloat(mass.mass_parts.end_of_mass);
+        const start = parseFloat(mass.mass_parts.beginning_of_mass as string);
+        const end = parseFloat(mass.mass_parts.end_of_mass as string);
         const duration = (!isNaN(start) && !isNaN(end)) ? end - start : 0;
         return { ...mass, duration };
     });
 
     if (massSortOrder === 'asc') {
-        massesWithDuration.sort((a, b) => a.duration - b.duration);
+        massesWithDuration.sort((a, b) => (a.duration || 0) - (b.duration || 0));
     } else {
-        massesWithDuration.sort((a, b) => b.duration - a.duration);
+        massesWithDuration.sort((a, b) => (b.duration || 0) - (a.duration || 0));
     }
     return massesWithDuration;
   }, [filteredData, massSortOrder]);
@@ -104,8 +105,8 @@ function App() {
   const averageDuration = useMemo(() => {
     if (filteredData.length === 0) return 0;
     const totalDuration = filteredData.reduce((acc, mass) => {
-      const start = parseFloat(mass.mass_parts.beginning_of_mass);
-      const end = parseFloat(mass.mass_parts.end_of_mass);
+      const start = parseFloat(mass.mass_parts.beginning_of_mass as string);
+      const end = parseFloat(mass.mass_parts.end_of_mass as string);
       if (!isNaN(start) && !isNaN(end)) {
         return acc + (end - start);
       }

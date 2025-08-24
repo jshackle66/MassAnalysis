@@ -1,9 +1,17 @@
 import React from 'react';
 
-const MassDurationBar = ({ massPartsData }) => {
+interface MassPartsData {
+    [key: string]: number;
+}
+
+interface MassDurationBarProps {
+    massPartsData: MassPartsData;
+}
+
+const MassDurationBar: React.FC<MassDurationBarProps> = ({ massPartsData }) => {
   const totalDuration = Object.values(massPartsData).reduce((sum, duration) => sum + duration, 0);
 
-  const partColors = {
+  const partColors: { [key: string]: string } = {
     beginning_of_mass: '#FFADAD',
     gloria: '#FFD6A5',
     first_reading: '#FDFFB6',
@@ -45,5 +53,3 @@ const MassDurationBar = ({ massPartsData }) => {
     </div>
   );
 };
-
-export default MassDurationBar;

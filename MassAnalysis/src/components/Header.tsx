@@ -1,7 +1,14 @@
 import React from 'react';
 import './Header.css';
 
-const Header = ({ theme, toggleTheme, massType, setMassType }) => {
+interface HeaderProps {
+  theme: string;
+  toggleTheme: () => void;
+  massType: string;
+  setMassType: (massType: string) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, massType, setMassType }) => {
   return (
     <header className="app-header">
       <h1 className="app-title">Mass Analysis</h1>

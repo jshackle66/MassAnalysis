@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Mass } from '../types';
 import Chart from 'chart.js/auto';
 import HomilyTranscript from './HomilyTranscript';
 import './HomilyTranscript.css';
@@ -16,20 +17,26 @@ const massPartOrder = [
     'end_of_mass'
 ];
 
-const MassPartChart = ({ mass, theme, partAverages }) => {
-    const chartRef = React.useRef(null);
-    const chartInstance = React.useRef(null);
+interface MassPartChartProps {
+    mass: Mass;
+    theme: string;
+    partAverages: { [key: string]: number };
+}
+
+const MassPartChart: React.FC<MassPartChartProps> = ({ mass, theme, partAverages }) => {
+    const chartRef = React.useRef<HTMLCanvasElement>(null);
+    const chartInstance = React.useRef<Chart | null>(null);
 
     React.useEffect(() => {
         if (!mass) return;
 
         const massParts = mass.mass_parts;
-        const partDurations = [];
+        const partDurations: { name: string, duration: number }[] = [];
 
         for (let i = 0; i < massPartOrder.length - 1; i++) {
             const partName = massPartOrder[i];
             
-            let nextPartName = null;
+            let nextPartName: string | null = null;
             for (let j = i + 1; j < massPartOrder.length; j++) {
                 if (massParts[massPartOrder[j]]) {
                     nextPartName = massPartOrder[j];
@@ -38,8 +45,8 @@ const MassPartChart = ({ mass, theme, partAverages }) => {
             }
 
             if (massParts[partName] && nextPartName) {
-                const startTime = parseFloat(massParts[partName]);
-                const endTime = parseFloat(massParts[nextPartName]);
+                const startTime = parseFloat(massParts[partName] as string);
+                const endTime = parseFloat(massParts[nextPartName] as string);
 
                 if(!isNaN(startTime) && !isNaN(endTime)) {
                     partDurations.push({ name: partName, duration: (endTime - startTime) / 60 });
@@ -55,7 +62,10 @@ const MassPartChart = ({ mass, theme, partAverages }) => {
             chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
         const chartContext = chartRef.current.getContext('2d');
+        if (!chartContext) return;
+
         const textColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.87)' : '#213547';
         const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
         const currentMassColor = theme === 'dark' ? 'rgba(255, 159, 64, 0.8)' : 'rgba(255, 159, 64, 0.6)';
@@ -91,18 +101,28 @@ const MassPartChart = ({ mass, theme, partAverages }) => {
     return <canvas ref={chartRef} />;
 };
 
-const MassDetailViewer = ({ mass, theme, data, massSortOrder, setMassSortOrder, onNext, onPrev }) => {
+interface MassDetailViewerProps {
+    mass: Mass;
+    theme: string;
+    data: Mass[];
+    massSortOrder: string;
+    setMassSortOrder: (order: string) => void;
+    onNext: () => void;
+    onPrev: () => void;
+}
+
+const MassDetailViewer: React.FC<MassDetailViewerProps> = ({ mass, theme, data, massSortOrder, setMassSortOrder, onNext, onPrev }) => {
 
     const partAverages = useMemo(() => {
-        const averages = {};
-        const counts = {};
+        const averages: { [key: string]: number } = {};
+        const counts: { [key: string]: number } = {};
         
         data.forEach(mass => {
             const massParts = mass.mass_parts;
             for (let i = 0; i < massPartOrder.length - 1; i++) {
                 const partName = massPartOrder[i];
                 
-                let nextPartName = null;
+                let nextPartName: string | null = null;
                 for (let j = i + 1; j < massPartOrder.length; j++) {
                     if (massParts[massPartOrder[j]]) {
                         nextPartName = massPartOrder[j];
@@ -111,8 +131,8 @@ const MassDetailViewer = ({ mass, theme, data, massSortOrder, setMassSortOrder, 
                 }
 
                 if (massParts[partName] && nextPartName) {
-                    const startTime = parseFloat(massParts[partName]);
-                    const endTime = parseFloat(massParts[nextPartName]);
+                    const startTime = parseFloat(massParts[partName] as string);
+                    const endTime = parseFloat(massParts[nextPartName] as string);
 
                     if(!isNaN(startTime) && !isNaN(endTime)) {
                         const duration = (endTime - startTime) / 60;

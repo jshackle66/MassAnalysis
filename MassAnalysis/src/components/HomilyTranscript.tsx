@@ -1,7 +1,14 @@
 import React, { useMemo } from 'react';
+import { Mass } from '../types';
 import { getHomily } from './getHomily';
 
-const HomilyTranscript = ({ mass, keyword }) => {
+
+interface HomilyTranscriptProps {
+    mass: Mass;
+    keyword?: string;
+}
+
+const HomilyTranscript: React.FC<HomilyTranscriptProps> = ({ mass, keyword }) => {
     const homilyText = useMemo(() => getHomily(mass), [mass]);
 
     const highlightedText = useMemo(() => {

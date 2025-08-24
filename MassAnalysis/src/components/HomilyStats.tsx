@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Mass } from '../types';
 import Chart from 'chart.js/auto';
+
+interface HomilyStatsProps {
+    data: Mass[];
+    theme: string;
+}
 
 const massPartOrder = [
     'homily', 
@@ -8,12 +14,12 @@ const massPartOrder = [
     'eucharistic_prayer', 
 ];
 
-const getHomilyDuration = (mass) => {
+const getHomilyDuration = (mass: Mass): number | null => {
     const massParts = mass.mass_parts;
-    const homilyStart = parseFloat(massParts.homily);
+    const homilyStart = parseFloat(massParts.homily as string);
     if(isNaN(homilyStart)) return null;
 
-    let nextPartName = null;
+    let nextPartName: string | null = null;
     for (let i = 1; i < massPartOrder.length; i++) {
         if (massParts[massPartOrder[i]]) {
             nextPartName = massPartOrder[i];
@@ -22,7 +28,7 @@ const getHomilyDuration = (mass) => {
     }
 
     if (nextPartName) {
-        const nextPartStart = parseFloat(massParts[nextPartName]);
+        const nextPartStart = parseFloat(massParts[nextPartName] as string);
         if(!isNaN(nextPartStart)) {
             return (nextPartStart - homilyStart) / 60; // in minutes
         }
@@ -30,14 +36,14 @@ const getHomilyDuration = (mass) => {
     return null;
 }
 
-const PriestAverageHomilyChart = ({ data, theme }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+const PriestAverageHomilyChart: React.FC<HomilyStatsProps> = ({ data, theme }) => {
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstance = useRef<Chart | null>(null);
 
     useEffect(() => {
         if (data.length === 0) return;
 
-        const priestData = {};
+        const priestData: { [key: string]: { totalDuration: number, count: number } } = {};
         data.forEach(mass => {
             const priest = mass.metadata.priest;
             if (!priest) return;
@@ -58,7 +64,10 @@ const PriestAverageHomilyChart = ({ data, theme }) => {
             chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
         const chartContext = chartRef.current.getContext('2d');
+        if (!chartContext) return;
+
         const textColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.87)' : '#213547';
         const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
         const barBackgroundColor = theme === 'dark' ? 'rgba(75, 192, 192, 0.8)' : 'rgba(75, 192, 192, 0.6)';
@@ -88,9 +97,15 @@ const PriestAverageHomilyChart = ({ data, theme }) => {
     return <canvas ref={chartRef} />;
 };
 
-const PriestHomilyHistogram = ({ data, priest, theme }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+interface PriestHomilyHistogramProps {
+    data: Mass[];
+    priest: string;
+    theme: string;
+}
+
+const PriestHomilyHistogram: React.FC<PriestHomilyHistogramProps> = ({ data, priest, theme }) => {
+    const chartRef = useRef<HTMLCanvasElement>(null);
+    const chartInstance = useRef<Chart | null>(null);
 
     useEffect(() => {
         const filteredData = data.filter(mass => mass.metadata.priest === priest);
@@ -102,32 +117,36 @@ const PriestHomilyHistogram = ({ data, priest, theme }) => {
             return;
         };
 
-        const homilyDurations = filteredData.map(getHomilyDuration).filter(d => d !== null);
+        const homilyDurations = filteredData.map(getHomilyDuration).filter((d): d is number => d !== null);
 
         if (chartInstance.current) {
             chartInstance.current.destroy();
         }
 
+        if (!chartRef.current) return;
         const chartContext = chartRef.current.getContext('2d');
+        if (!chartContext) return;
         
         const numBins = homilyDurations.length > 0 ? Math.ceil(Math.sqrt(homilyDurations.length)) : 1;
         const minDuration = homilyDurations.length > 0 ? Math.min(...homilyDurations) : 0;
         const maxDuration = homilyDurations.length > 0 ? Math.max(...homilyDurations) : 1;
         const binWidth = (maxDuration - minDuration) / numBins;
 
-        const bins = {};
-        for (let i = 0; i < numBins; i++) {
-            const binStart = minDuration + i * binWidth;
-            bins[binStart] = 0;
-        }
-
-        homilyDurations.forEach(duration => {
-            const binIndex = Math.floor((duration - minDuration) / binWidth);
-            const binStart = minDuration + binIndex * binWidth;
-            if(bins[binStart] !== undefined) {
-                bins[binStart]++;
+        const bins: { [key: number]: number } = {};
+        if (homilyDurations.length > 0) {
+            for (let i = 0; i < numBins; i++) {
+                const binStart = minDuration + i * binWidth;
+                bins[binStart] = 0;
             }
-        });
+
+            homilyDurations.forEach(duration => {
+                const binIndex = Math.floor((duration - minDuration) / binWidth);
+                const binStart = minDuration + binIndex * binWidth;
+                if(bins[binStart] !== undefined) {
+                    bins[binStart]++;
+                }
+            });
+        }
 
         const labels = Object.keys(bins).map(binStart => {
             const start = parseFloat(binStart).toFixed(1);
@@ -165,9 +184,9 @@ const PriestHomilyHistogram = ({ data, priest, theme }) => {
 };
 
 
-const HomilyStats = ({ data, theme }) => {
+const HomilyStats: React.FC<HomilyStatsProps> = ({ data, theme }) => {
     const [selectedPriest, setSelectedPriest] = useState('');
-    const [priests, setPriests] = useState([]);
+    const [priests, setPriests] = useState<string[]>([]);
 
     useEffect(() => {
         const uniquePriests = [...new Set(data.map(mass => mass.metadata.priest))].filter(p => p);
@@ -185,7 +204,7 @@ const HomilyStats = ({ data, theme }) => {
             </div>
             <div className="chart-container">
                 <h3>
-                    Homily Duration Histogram for
+                    Mass Duration Histogram for
                     <select value={selectedPriest} onChange={e => setSelectedPriest(e.target.value)}>
                         {priests.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
