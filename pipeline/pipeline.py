@@ -39,17 +39,6 @@ def create_voice_fingerprint(audio_path):
         #    - The result is a matrix where columns are frames and rows are MFCCs
         mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
 
-        # Save MFCC visualization
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=(12, 8))
-        librosa.display.specshow(mfccs, sr=sr, x_axis='time')
-        plt.colorbar(format='%+2.0f dB')
-        plt.title('MFCC')
-        plt.tight_layout()
-        mfcc_plot_path = os.path.splitext(audio_path)[0] + '_mfcc.png'
-        plt.savefig(mfcc_plot_path)
-        plt.close()
-
         # 3. Create the fingerprint by taking the mean of each coefficient
         fingerprint = np.concatenate([
             np.mean(mfccs, axis=1)
@@ -91,7 +80,7 @@ def extract_homily_audio(input_file, mass_parts, output_file):
     homily_audio.export(output_file, format="mp3")
 
 
-def find_cut_time(file_path, rms_threshold=500, silence_duration_min=10):
+def find_cut_time(file_path, rms_plot_file, channels_plot_file, rms_threshold=200, silence_duration_min=10):
     """
     Analyzes the audio file to find a suitable cut time.
     The cut time is the beginning of the first silence longer than `silence_duration_min`
@@ -101,10 +90,41 @@ def find_cut_time(file_path, rms_threshold=500, silence_duration_min=10):
     if audio.channels == 2:
         samples = samples.reshape((-1, 2))
         samples = samples.mean(axis=1)
+    
+    import matplotlib.pyplot as plt
 
+    # Plot raw audio samples
+    plt.figure(figsize=(15,5))
+    plt.plot(samples)
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.title('Audio Waveform')
+    plt.grid(True)
+    plt.savefig(channels_plot_file)
+    plt.close()
 
     window_size = int(audio.frame_rate * 0.1)  # 100ms
-    
+
+    # Plot RMS values compared to threshold
+    rms_values = []
+    times = []
+    for i in range(0, len(samples) - window_size, window_size):
+        window = samples[i:i + window_size]
+        rms = np.sqrt(np.mean(window**2))
+        time_seconds = i / audio.frame_rate
+        rms_values.append(rms)
+        times.append(time_seconds)
+
+    plt.figure(figsize=(15,5))
+    plt.plot(times, rms_values, label='RMS')
+    plt.axhline(y=rms_threshold, color='r', linestyle='--', label='Threshold')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('RMS')
+    plt.title('RMS Values vs Threshold')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(rms_plot_file)
+    plt.close()    
     silence_duration_ms = silence_duration_min * 60 * 1000
     silence_windows = int(silence_duration_ms / 100)
     consecutive_silent_windows = 0
@@ -179,7 +199,9 @@ def main(input_file, service, model, override=False):
     if not skip_cut_audio:
         # 1. Find cut time
         print("Finding cut time...")
-        cut_time = find_cut_time(input_file)
+        rms_plot_file = f"{os.path.splitext(input_file)[0]}_rms_plot.png"
+        channels_plot_file = f"{os.path.splitext(input_file)[0]}_channels_plot.png"
+        cut_time = find_cut_time(input_file, rms_plot_file=rms_plot_file, channels_plot_file=channels_plot_file)
         if cut_time == None:
             print("Could not find a suitable cut time, processing entire file.")
         else:
@@ -312,7 +334,10 @@ def main(input_file, service, model, override=False):
     if not skip_priest_detection:
         # 9. Detect priest
         print("Detecting priest...")
+        # TODO Create method for detecting priest
         priest_label = "Unknown"
+        with open(priest_file, "w") as f:
+            f.write(priest_label)
     else:
         with open(priest_file, "r") as f:
             priest_label = f.read().strip()
