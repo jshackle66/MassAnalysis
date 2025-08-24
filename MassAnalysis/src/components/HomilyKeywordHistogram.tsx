@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Mass } from '../types';
 import Chart from 'chart.js/auto';
+import { getHomily } from './getHomily';
 
 interface HomilyKeywordHistogramProps {
     data: Mass[];
