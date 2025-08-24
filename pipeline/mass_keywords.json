@@ -1,13 +1,13 @@
 {
   "beginning_of_mass": [
     "The Lord be with you",
+    "In the name",
+    "Of the father",
+    "Of the Son",
+    "and of the Holy Spirit",
     "Let us pray",
     "Lord have mercy",
     "Christ have mercy"
-  ],
-  "first_reading": [
-    "A reading from the book of",
-    "The Word of the Lord"
   ],
   "gloria": [
     "Glory to God in the highest",
@@ -18,7 +18,6 @@
     "You take away the sins of the world",
     "receive our prayer",
     "You are seated at the right hand of the Father",
-    "have mercy on us",
     "For you alone are the Holy One",
     "You alone are the Lord",
     "You alone are the Most High",
@@ -27,11 +26,17 @@
     "in the glory of God the Father",
     "Amen"
   ],
+  "first_reading": [
+    "A reading from the book of",
+    "The Word of the Lord"
+  ],
   "gospel": [
-    "A reading from the holy Gospel according to"
+    "A reading from the holy Gospel according to",
+    "a reading from the Holy Gospel"
   ],
   "homily": [
     "The Gospel of the Lord",
+    "The Gospel of the",
     "Praise to you, Lord Jesus Christ",
     "My brothers and sisters",
     "Dear friends",
