@@ -37,7 +37,9 @@ def analyze_transcription(transcription_data):
         keywords = mass_keywords.get(part_name, [])
         
         found_part = False
-        for segment in transcription_data["chunks"]:
+        for ii in range(len(transcription_data["chunks"])):
+            segment = transcription_data["chunks"][ii]
+
             # The timestamp is a list [start, end]
             timestamp_start = segment.get("timestamp", [0, None])[0]
             
@@ -49,6 +51,15 @@ def analyze_transcription(transcription_data):
                 continue
 
             text = segment.get("text", "").lower()
+
+            # Add context to current segment
+            if ii > 0:
+                prior_text = transcription_data["chunks"][ii - 1].get("text", "").lower()
+                text = prior_text + " " + text
+
+            # Replace all >1 spaces with one space
+            text = " ".join(text.split())
+            
             for keyword in keywords:
                 if keyword.lower() in text:
                     detected_parts[part_name] = timestamp_start
