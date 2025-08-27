@@ -14,32 +14,28 @@
     "Lord God, heavenly King",
     "Almighty God and Father",
     "Lord Jesus Christ, only Son of the Father",
-    "Lamb of God",
-    "You take away the sins of the world",
-    "receive our prayer",
     "You are seated at the right hand of the Father",
     "For you alone are the Holy One",
     "You alone are the Lord",
     "You alone are the Most High",
-    "Jesus Christ",
-    "with the Holy Spirit",
-    "in the glory of God the Father",
-    "Amen"
+    "in the glory of God the Father"
   ],
   "first_reading": [
     "A reading from the book of",
+    "reading from the book of",
     "The Word of the Lord"
   ],
   "gospel": [
     "A reading from the holy Gospel according to",
-    "a reading from the Holy Gospel"
+    "a reading from the Holy Gospel",
+    "reading from the holy Gospel",
+    "Gospel according to"
   ],
   "homily": [
     "The Gospel of the Lord",
+    "Gospel of the Lord",
     "The Gospel of the",
     "Praise to you, Lord Jesus Christ",
-    "My brothers and sisters",
-    "Dear friends",
     "The word of God today",
     "Let us reflect on",
     "In our Gospel reading",
@@ -52,18 +48,14 @@
     "His only son our lord"
   ],
   "prayers_of_the_faithful": [
+    "Let us stand now",
+    "we make our prayer",
     "we make our petitions known to Him",
     "Let us pray to the Lord",
     "Lord, hear our prayer",
-    "For the Church",
-    "For our Holy Father",
-    "For all leaders",
-    "For those who suffer",
-    "For the sick",
-    "For the poor",
-    "For peace",
-    "For our community",
-    "We pray to the Lord"
+    "We pray to the Lord",
+    "We present our petitions",
+    "We pray for our church"
   ],
   "eucharistic_prayer": [
     "The Lord be with you",
@@ -91,10 +83,12 @@
   ],
   "end_of_mass": [
     "The Mass is ended",
+    "The Mass has ended",
     "Go in peace",
     "Thanks be to God",
     "May Almighty God bless you",
     "Father, Son, and Holy Spirit",
-    "Go forth, the Mass is ended"
+    "Go forth, the Mass is ended",
+    "Saint Michael, the Archangel, defend us in battle"
   ]
 }
