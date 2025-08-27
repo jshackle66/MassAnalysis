@@ -116,40 +116,42 @@ const HomilyKeywordHistogram: React.FC<HomilyKeywordHistogramProps> = ({ data, t
     }, [data, keyword, theme]);
 
     return (
-        <div className="homily-keyword-histogram-container">
-            <h3>Keyword Frequency in Homilies</h3>
-            <div className="controls">
-                <input
-                    type="text"
-                    value={keyword}
-                    onChange={handleKeywordChange}
-                    placeholder="Enter keyword"
-                />
-            </div>
-            <div className="display-area">
-                <div className="histogram-area">
-                    <canvas ref={chartRef} />
+        <div className='homily-keyword-container'>
+            <div className="homily-keyword-histogram-container">
+                <h3>Keyword Frequency in Homilies</h3>
+                <div className="controls">
+                    <input
+                        type="text"
+                        value={keyword}
+                        onChange={handleKeywordChange}
+                        placeholder="Enter keyword"
+                    />
                 </div>
-                <div className="transcript-area">
-                    <div className="homily-transcript-section">
-                        <h3>
-                            Homily Transcripts for
-                            <select value={selectedPriest} onChange={e => {
-                                setSelectedPriest(e.target.value);
-                            }}>
-                                {priests.map(p => <option key={p} value={p}>{p}</option>)}
-                            </select>
-                        </h3>
-                        {currentMass ? (
-                            <div>
-                                <div className="controls">
-                                    <button onClick={handlePrevHomily}>&larr; Previous</button>
-                                    <button onClick={handleNextHomily}>Next &rarr;</button>
-                                </div>
-                                <HomilyTranscript mass={currentMass} keyword={keyword} />
-                            </div>
-                        ) : <p>No homilies found for the selected priest and keyword.</p>}
+                <div className="display-area">
+                    <div className="histogram-area">
+                        <canvas ref={chartRef} />
                     </div>
+                </div>
+            </div>
+            <div className="transcript-area">
+                <div className="homily-transcript-section">
+                    <h3>
+                        Homily Transcripts for
+                        <select value={selectedPriest} onChange={e => {
+                            setSelectedPriest(e.target.value);
+                        }}>
+                            {priests.map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                    </h3>
+                    {currentMass ? (
+                        <div>
+                            <div className="controls">
+                                <button onClick={handlePrevHomily}>&larr; Previous</button>
+                                <button onClick={handleNextHomily}>Next &rarr;</button>
+                            </div>
+                            <HomilyTranscript mass={currentMass} keyword={keyword} />
+                        </div>
+                    ) : <p>No homilies found for the selected priest and keyword.</p>}
                 </div>
             </div>
         </div>

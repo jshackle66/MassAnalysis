@@ -3,7 +3,7 @@
 }
 
 .transcript-content {
-    max-height: 60vh;
+    max-height: 30vh;
     overflow-y: auto;
     border: 1px solid var(--border-color);
     padding: 1rem;

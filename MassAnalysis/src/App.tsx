@@ -128,7 +128,7 @@ function App() {
       />
       <main className="main-content-scrolling">
         <GraphSection>
-            <h2>Mass Duration Histogram ({massType})</h2>
+            <h2>Mass Duration Histogram</h2>
             {filteredData.length > 0 && (
               <div className="stats-container">
                 <h3>Average Mass Duration: {averageMinutes}m {averageSeconds}s</h3>
