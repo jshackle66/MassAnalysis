@@ -204,7 +204,7 @@ const HomilyStats: React.FC<HomilyStatsProps> = ({ data, theme }) => {
             </div>
             <div className="chart-container">
                 <h3>
-                    Mass Duration Histogram for
+                    Homily Duration Histogram for
                     <select value={selectedPriest} onChange={e => setSelectedPriest(e.target.value)}>
                         {priests.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
