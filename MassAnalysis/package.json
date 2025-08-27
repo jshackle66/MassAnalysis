@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && sed -i 's|/assets|/MassAnalysis/assets|g' dist/index.html && sed -i 's|/results.json|/MassAnalysis/MassAnalysis/public/results.json|g' dist/assets/*.* && rm -rf ../assets && mv dist/* ../ && rmdir dist",
+    "build": "vite build && sed -i 's|/assets|/MassAnalysis/assets|g' dist/index.html && sed -i 's|/favicon.svg|/MassAnalysis/MassAnalysis/public/favicon.svg|g' dist/index.html && sed -i 's|/results.json|/MassAnalysis/MassAnalysis/public/results.json|g' dist/assets/*.* && rm -rf ../assets && mv dist/* ../ && rmdir dist",
     "preview": "vite preview"
   },
   "dependencies": {
